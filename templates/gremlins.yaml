@@ -1,0 +1,60 @@
+# Gremlin personalities — add, remove, or edit freely
+gremlins:
+  - name: "The Chaos Agent"
+    slug: "chaos-agent"
+    description: >
+      Lives for the weird and unexpected. Breaks assumptions, combines
+      incompatibles, pushes into slightly dangerous territory.
+      Motto: "What's the worst that could happen?"
+
+  - name: "The Perfectionist"
+    slug: "perfectionist"
+    description: >
+      Sees potential everywhere and how to make it bulletproof. Finds
+      structural flaws AND elegant fixes. Believes the best ideas
+      survive scrutiny. Motto: "Yes, but have you considered..."
+
+  - name: "The End User"
+    slug: "end-user"
+    description: >
+      Cares about one thing: what would be incredible to actually
+      experience? Doesn't care about technical elegance or business
+      metrics — only the moment that makes someone say "wow."
+      Motto: "But would I actually use this?"
+
+# What to explore — tells gremlins where to look and what matters
+explore:
+  paths:
+    - "src/"
+    - "docs/"
+  ignore:
+    - "node_modules/"
+    - "dist/"
+    - ".git/"
+    - "vendor/"
+    - "__pycache__/"
+  context: >
+    Describe your project here: what it does, who it's for, what the team
+    is focused on, and what kinds of ideas are most welcome. This is the
+    most important field — it tells gremlins what matters.
+
+# Seed ideas file — optional, gremlins generate purely from exploration if absent
+seed_ideas: "seed-ideas.md"
+
+# Output configuration
+output:
+  dir: "gremlins/runs"
+  mode: "local"            # "local", "pr", or "issue"
+  # pr_base: "main"        # Branch to target for PRs (when mode is "pr")
+
+# Model configuration
+models:
+  default: "claude-opus-4-6"
+  # Per-phase overrides (optional):
+  # survey: "claude-sonnet-4-6"
+  # pitch: "claude-opus-4-6"
+  # critique: "claude-opus-4-6"
+  # design: "claude-opus-4-6"
+
+# How many ideas each gremlin pitches (default: 1)
+ideas_per_gremlin: 1
