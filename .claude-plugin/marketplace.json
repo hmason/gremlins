@@ -1,0 +1,26 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "gremlins",
+  "metadata": {
+    "description": "Autonomous idea-generating agents with distinct personalities that explore your project and produce creative design documents."
+  },
+  "owner": {
+    "name": "Hilary Mason",
+    "email": "hmason@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "gremlins",
+      "description": "Run a team of AI agents with distinct creative personalities against your project: each pitches a wild idea, they cross-critique, then produce full design documents. Five-phase orchestrated workflow (survey, pitch, critique, deep-dive, design, deliver) with local, PR, or GitHub-issue output modes.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Hilary Mason",
+        "email": "hmason@gmail.com"
+      },
+      "source": "./",
+      "category": "creativity",
+      "homepage": "https://github.com/hmason/gremlins",
+      "tags": ["agents", "ideation", "creativity", "brainstorming", "design"]
+    }
+  ]
+}

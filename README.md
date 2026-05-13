@@ -14,8 +14,18 @@ Ideas can be **features** (new capabilities) or **content** (a specific new inst
 
 ## Installation
 
+Add the marketplace, then install:
+
 ```bash
-claude plugins add <this-repo-url>
+claude plugin marketplace add hmason/gremlins
+claude plugin install gremlins
+```
+
+Or load it for a single session without installing (handy for trying it out or editing the prompts):
+
+```bash
+git clone https://github.com/hmason/gremlins
+claude --plugin-dir ./gremlins
 ```
 
 ## Quick Start
