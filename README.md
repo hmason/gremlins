@@ -17,7 +17,7 @@ Ideas can be **features** (new capabilities) or **content** (a specific new inst
 Add the marketplace, then install:
 
 ```bash
-claude plugin marketplace add hmason/gremlins
+claude plugin marketplace add https://github.com/hmason/gremlins
 claude plugin install gremlins
 ```
 
