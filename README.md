@@ -10,6 +10,8 @@ Autonomous idea generation agents for Claude Code. Gremlins explores your projec
 4. **Design** — Each gremlin produces a full design document incorporating feedback
 5. **Deliver** — A summary with all designs is delivered as local files, a PR, or a GitHub issue
 
+Ideas can be **features** (new capabilities) or **content** (a specific new instance of an existing data type — a new template, a new entry in a registry, a new value in an enum). Both are first-class outputs. If your project has a content surface, gremlins will pitch into it.
+
 ## Installation
 
 ```bash

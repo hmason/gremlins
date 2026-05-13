@@ -145,15 +145,25 @@ Interactive, conversational setup — one question per step:
 
 ---
 
-## 5-Phase Orchestration (`gremlins run`)
+## Idea Types: Features vs. Content
+
+Pitches can be **features** (new capabilities, system changes) or **content** (a specific new instance of an existing data type — a new template, a new entry in a registry, a new value in an enum, a new entry in a content list). Both are first-class outputs. For projects with obvious content surfaces — registries, template lists, data files — a single juicy content artifact is a real shippable thing, not a lesser idea than a feature. The orchestrator surfaces content surfaces during the survey; gremlins choose freely.
+
+## Orchestration (`gremlins run`)
+
+### Setup
+- Reads config, seed ideas, and the gremlin prompt template
+- Creates output directory `runs/YYYY-MM-DD/{pitches,critiques,designs}/`
+- **If `output.mode` is `pr`, creates and checks out the branch `gremlins/YYYY-MM-DD` upfront** so each phase can commit incrementally and a partial run still produces a reviewable PR
 
 ### Phase 1: Survey (Orchestrator, read-only)
 - Reads `gremlins.yaml` for config
 - Reads `seed-ideas.md` if present
 - Explores paths in `explore.paths`, skipping `explore.ignore`
 - Reads `explore.context` to understand what matters
+- Notes content surfaces (registries, template lists, data files) where a "new entry" is a meaningful unit of work
 - Checks previous runs in `output.dir` to avoid repeating ideas
-- Produces an in-memory context brief
+- Produces an in-memory context brief (≤ 500 words)
 
 ### Phase 2: Pitching (N parallel subagents, where N = number of gremlins in config)
 One subagent per gremlin. Each receives:
@@ -161,7 +171,7 @@ One subagent per gremlin. Each receives:
 - Their personality description from config
 - Gremlin prompt template (pitch section)
 
-Each picks ONE idea and writes a pitch to `runs/YYYY-MM-DD/pitches/{slug}.md`.
+Each picks ONE idea (feature or content) and writes a pitch to `runs/YYYY-MM-DD/pitches/{slug}.md`. If PR mode, orchestrator commits pitches after this phase.
 
 ### Phase 3: Cross-Critique (N parallel subagents)
 Each gremlin reads ALL pitches. Each writes critiques of the OTHER gremlins' ideas to `runs/YYYY-MM-DD/critiques/{slug}.md`. Critiques stay in character:
@@ -169,17 +179,28 @@ Each gremlin reads ALL pitches. Each writes critiques of the OTHER gremlins' ide
 - Perfectionist finds structural flaws and fixes
 - End User asks "would I actually use this?"
 
-### Phase 4: Design (N parallel subagents)
-Each gremlin reads critiques others wrote about THEIR pitch. Produces a full design doc at `runs/YYYY-MM-DD/designs/{slug}-{idea-slug}.md`:
+If PR mode, orchestrator commits critiques after this phase.
 
-- Problem/opportunity statement
-- Proposed solution
-- User experience description
-- 2-3 approaches considered with trade-offs
-- Recommended approach with reasoning
-- Impact assessment (effort, risk, dependencies)
-- Open questions for humans
-- "Why this is a gremlin idea" — what assumption it challenges
+### Phase 3.5: Deep Dive (Orchestrator)
+Before Phase 4 fans out, the **orchestrator** does targeted exploration for each pitch — reading the specific files, types, and interfaces the idea would touch. Each deep dive is capped at ~400 words and contains code snippets, file paths, and extension points. For content pitches, the deep dive also includes the schema/type definition, 1-2 representative examples, and the registration point.
+
+This phase exists for reliability: long subagent exploration followed by long subagent writing is the single most common failure mode (stream-idle timeouts). Moving the exploration to the orchestrator and passing a compact, pre-digested deep dive into Phase 4 dramatically reduces the failure rate.
+
+### Phase 4: Design (N parallel subagents)
+Each gremlin receives:
+- Their original pitch
+- Critiques the other gremlins wrote about it
+- The deep dive the orchestrator prepared for this idea
+
+The subagent writes a full design doc at `runs/YYYY-MM-DD/designs/{slug}-{idea-slug}.md` using a **skeleton-first-then-Edit-per-section** pattern: a single Write call creates the file with section headers only, then one Edit call per section fills the content. Short tool calls reset the idle clock and checkpoint progress to disk, so a mid-run timeout still leaves completed sections saved.
+
+Length budgets: ≤ 1000 words for feature ideas, ≤ 1500 words for content ideas.
+
+**Feature design sections:** Problem statement, Proposed solution, User experience, Approaches considered (2-3 with trade-offs), Impact assessment, Open questions for humans, Wildness rating (1-5), Why this is a gremlin idea.
+
+**Content design sections:** Problem statement, Proposed solution, User experience, **Draft of the content** (in the shape of the schema), **Where it goes** (file path + registration steps), **Three example moments**, Open questions for humans, Wildness rating, Why this is a gremlin idea.
+
+If a subagent times out or produces an empty file, the orchestrator respawns it once with a tightened prompt: critiques dropped, lower word cap (800/1200), single example moment for content ideas, but the skeleton-first-then-Edit pattern preserved. The orchestrator **never** writes long-form content inline in its own turn — that path causes the same stream-idle timeouts. If PR mode, orchestrator commits designs after this phase.
 
 ### Phase 5: Summary & Delivery (Orchestrator)
 - Reads all design docs
@@ -187,13 +208,14 @@ Each gremlin reads critiques others wrote about THEIR pitch. Produces a full des
 - Updates `seed-ideas.md` (moves used seeds to "Previously Used")
 - Delivers based on `output.mode`:
   - **local:** Done — prints summary to terminal
-  - **pr:** Creates branch `gremlins/YYYY-MM-DD`, commits, opens PR
+  - **pr:** Commits the README, pushes the branch (created in Setup), opens a PR
   - **issue:** Posts summary as GitHub issue
 
 ### Subagent tool access
-- Read, Glob, Grep — codebase exploration
-- Write — output files only
-- No destructive tools. Agents never modify existing code.
+- **Phase 2 (pitch):** Read, Glob, Grep, Write
+- **Phase 3 (critique):** Write only
+- **Phase 4 (design):** Read, Write, Edit (Read and Edit are required for the skeleton-first-then-Edit-per-section pattern)
+- No destructive tools. Agents never modify existing project files.
 
 ---
 
@@ -208,21 +230,23 @@ The orchestrator agent follows this file. Contains:
 3. **Phase 2-4 subagent dispatch instructions** — for each phase, spawn N parallel agents using the gremlin prompt template with these placeholders filled in:
    - `{{PERSONALITY_NAME}}`, `{{PERSONALITY_DESCRIPTION}}` — from config
    - `{{CONTEXT_BRIEF}}` — built during Phase 1
-   - `{{PHASE}}` — "pitch", "critique", or "design"
    - `{{OUTPUT_PATH}}` — where to write results
-   - `{{ALL_PITCHES}}` — (Phase 3+) content of all pitch files
+   - `{{ALL_PITCHES}}` — (Phase 3) content of all pitch files
+   - `{{MY_PITCH}}` — (Phase 4) the gremlin's own pitch
    - `{{CRITIQUES_OF_MY_PITCH}}` — (Phase 4) critiques from other gremlins
-4. **Phase 5 summary instructions** — compile README, deliver per output mode, update seed tracking
+   - `{{DEEP_DIVE}}` — (Phase 4) the targeted deep dive the orchestrator produced in Phase 3.5 for this idea
+4. **Phase 3.5 deep-dive instructions** — orchestrator-side targeted exploration of files/types relevant to each pitch, capped at ~400 words per idea
+5. **Phase 5 summary instructions** — compile README, deliver per output mode, update seed tracking
 
 ### `gremlin-prompt-template.md`
 
-Single template used for all three subagent phases, with sections gated by `{{PHASE}}`:
+Single template used for all three subagent phases. The orchestrator selects the appropriate phase section when constructing each subagent's prompt:
 
-- **Identity section** — "You are {{PERSONALITY_NAME}}. {{PERSONALITY_DESCRIPTION}}"
+- **Identity section** — "You are {{PERSONALITY_NAME}}. {{PERSONALITY_DESCRIPTION}}" + framing on features-vs-content
 - **Context section** — the context brief
-- **Pitch instructions** (Phase 2) — explore through your personality lens, pick one idea, write a pitch
+- **Pitch instructions** (Phase 2) — explore through your personality lens, pick one idea (feature or content), write a pitch
 - **Critique instructions** (Phase 3) — read all pitches, critique the others in character
-- **Design instructions** (Phase 4) — read critiques of your pitch, deep dive, produce full design doc
+- **Design instructions** (Phase 4) — read critiques of your pitch + the orchestrator's deep dive, produce a full design doc using skeleton-first-then-Edit-per-section. Sections differ for feature vs content ideas.
 
 Placeholder substitution is simple string replacement — no templating engine.
 
