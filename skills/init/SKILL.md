@@ -1,5 +1,4 @@
 ---
-name: gremlins init
 description: Set up gremlins in your project — interactive wizard that generates config and prompt files
 ---
 
@@ -58,7 +57,8 @@ If they want to add some, collect ideas conversationally until they say they're 
 
 ## Step 6: Generate Files
 
-Read the template files from the plugin's `templates/` directory:
+Read the template files bundled with this skill. The templates live in the `templates/` directory next to this SKILL.md — resolve `${CLAUDE_PLUGIN_ROOT}/skills/init/templates/` if the relative path doesn't work:
+
 - Read `templates/gremlins.yaml` as the base config
 - Read `templates/orchestrator-prompt.md`
 - Read `templates/gremlin-prompt-template.md`
@@ -87,6 +87,6 @@ Print a summary:
 > - `gremlins/gremlin-prompt-template.md` — the subagent prompt template (editable)
 > - `gremlins/seed-ideas.md` — your seed ideas
 >
-> **To run gremlins now:** `/gremlins run`
-> **To schedule recurring runs:** `/gremlins schedule`
+> **To run gremlins now:** `/gremlins:run`
+> **To schedule recurring runs:** `/gremlins:schedule`
 > **To customize behavior:** Edit the prompt files directly — they're yours."

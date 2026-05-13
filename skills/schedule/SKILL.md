@@ -1,5 +1,4 @@
 ---
-name: gremlins schedule
 description: Schedule recurring gremlins runs using Claude Code Remote Triggers
 ---
 
@@ -10,9 +9,9 @@ Manage scheduled gremlins runs. This is a thin wrapper around Claude Code's Remo
 ## Determine Subcommand
 
 Parse the user's input to determine which action they want:
-- `/gremlins schedule` (no args) or `/gremlins schedule create` → **Create**
-- `/gremlins schedule list` → **List**
-- `/gremlins schedule remove` → **Remove**
+- `/gremlins:schedule` (no args) or `/gremlins:schedule create` → **Create**
+- `/gremlins:schedule list` → **List**
+- `/gremlins:schedule remove` → **Remove**
 
 ---
 
@@ -20,8 +19,8 @@ Parse the user's input to determine which action they want:
 
 ### Pre-flight Check
 
-1. Check if `gremlins/gremlins.yaml` exists. If not, tell the user to run `/gremlins init` first.
-2. Check if `gremlins/orchestrator-prompt.md` exists. If not, tell the user to run `/gremlins init` first.
+1. Check if `gremlins/gremlins.yaml` exists. If not, tell the user to run `/gremlins:init` first.
+2. Check if `gremlins/orchestrator-prompt.md` exists. If not, tell the user to run `/gremlins:init` first.
 
 ### Interactive Setup
 
@@ -47,7 +46,7 @@ Use the RemoteTrigger tool (or the `/schedule` skill) to create a Remote Trigger
 - **Model:** Read `models.default` from `gremlins/gremlins.yaml` (default: `claude-opus-4-6`)
 
 Print confirmation:
-> "Scheduled! Gremlins will run [frequency description] at [time]. To manage this schedule, use `/gremlins schedule list` or `/gremlins schedule remove`."
+> "Scheduled! Gremlins will run [frequency description] at [time]. To manage this schedule, use `/gremlins:schedule list` or `/gremlins:schedule remove`."
 
 ---
 
@@ -58,7 +57,7 @@ List all Remote Triggers and filter for any whose prompt contains "orchestrator-
 - Model
 - Trigger ID
 
-If none found: "No gremlins schedule configured. Use `/gremlins schedule` to set one up."
+If none found: "No gremlins schedule configured. Use `/gremlins:schedule` to set one up."
 
 ---
 

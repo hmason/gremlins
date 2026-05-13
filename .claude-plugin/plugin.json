@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "gremlins",
+  "description": "Autonomous idea generation agents with distinct personalities that explore your project and produce design documents",
+  "version": "1.0.0",
+  "author": {
+    "name": "Hilary Mason",
+    "email": "hmason@gmail.com"
+  },
+  "homepage": "https://github.com/hmason/gremlins",
+  "repository": "https://github.com/hmason/gremlins",
+  "license": "MIT"
+}

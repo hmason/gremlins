@@ -30,15 +30,15 @@ claude --plugin-dir ./gremlins
 
 ## Quick Start
 
-```bash
+```
 # Set up gremlins in your project (interactive wizard)
-/gremlins init
+/gremlins:init
 
 # Run gremlins now
-/gremlins run
+/gremlins:run
 
 # Schedule recurring runs
-/gremlins schedule
+/gremlins:schedule
 ```
 
 ## Default Personalities
@@ -51,7 +51,7 @@ You can customize personalities, add new ones, or start from scratch during setu
 
 ## Configuration
 
-After running `/gremlins init`, your project gets a `gremlins/` directory:
+After running `/gremlins:init`, your project gets a `gremlins/` directory:
 
 - `gremlins.yaml` — personalities, exploration paths, output mode, model settings
 - `orchestrator-prompt.md` — the full orchestrator instructions (editable)
