@@ -1,6 +1,8 @@
 # Gremlins
 
-Autonomous idea generation agents for Claude Code. Gremlins explores your project with distinct AI personalities, then produces creative design documents through a structured pitch → critique → design workflow.
+Autonomous bad/brilliant idea generation agents for Claude Code. Gremlins explores your project with distinct AI personalities, then produces creative design documents through a structured pitch → critique → design workflow.
+
+This project was inspired by [Nightshift](https://github.com/marcus/nightshift), except instead of using your extra token budget for banal code maintentance tasks, it uses it to explore the edge of the idea space for your product.
 
 ## How it works
 
